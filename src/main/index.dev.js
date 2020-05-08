@@ -8,6 +8,8 @@
 /* eslint-disable */
 
 // Install `electron-debug` with `devtron`
+import {BrowserWindow} from "electron";
+
 require('electron-debug')({ showDevTools: true })
 
 // Install `vue-devtools`
@@ -20,5 +22,13 @@ require('electron').app.on('ready', () => {
     })
 })
 
+const path = require('path')
+const os = require('os')
+
+if (process.env.NODE_ENV === 'testing') {
+    BrowserWindow.addDevToolsExtension(
+        path.join(os.homedir(), '/Library/Application Support/Google/Chrome/Profile 1/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.3.3_0')
+    )
+}
 // Require `main` process to boot app
 require('./index')

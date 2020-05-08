@@ -7,12 +7,22 @@ export default new Router({
     routes: [
         {
             path: '/',
-            name: 'landing-page',
-            component: require('@/components/LandingPage').default
+            name: 'list',
+            component: require('@/components/Task/List').default
+        },
+        {
+            path: '/create',
+            name: 'create',
+            component: require('@/components/Task/Task').default
+        },
+        {
+            path: '/task/:id',
+            name: 'task',
+            component: require('@/components/Task/Task').default
         },
         {
             path: '*',
             redirect: '/'
-        }
+        },
     ]
 })
