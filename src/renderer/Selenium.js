@@ -1,9 +1,10 @@
 export default class Selenium {
     constructor() {
         this.log = []
-        this.screenshots = []
-        this.values = []
+        this.result = []
         this.error = null
+        this.running = false
+        this.done = false
     }
 
     set steps(steps) {
@@ -11,7 +12,8 @@ export default class Selenium {
     }
 
     async run() {
-        this.log.push('Opening browser...')
+        this.running = true
+        this.log.push({'message': 'Opening browser...'})
         const webdriver = require('selenium-webdriver')
         const browser = new webdriver.Builder()
             .usingServer('http://localhost:4444/wd/hub/')
@@ -22,6 +24,7 @@ export default class Selenium {
 
         try {
             for (let i = 0; i < this.actions.length; i++) {
+                let log = {}
                 let element
                 let action = this.actions[i]
 
@@ -35,59 +38,59 @@ export default class Selenium {
 
                 switch (action.action) {
                 case 'load_site':
-                    this.log.push(`Loading "${action.url}"...`)
+                    log.message = `Loading "${action.url}"...`
                     await browser.get(action.url)
                     break
 
                 case 'wait_for_element':
-                    debugger
-                    this.log.push(action.log || `Waiting for element "${action.element}"...`)
+                    log.message = action.log || `Waiting for element "${action.element}"...`
                     await browser.wait(webdriver.until.elementLocated(element), 15 * 1000)
                     break
 
                 case 'type':
-                    this.log.push(`Typing "${action.text}" to "${action.element}"...`)
+                    log.message = `Typing "${action.text}" to "${action.element}"...`
                     let input = await browser.findElement(element)
                     input.sendKeys(action.text)
                     break
 
                 case 'click':
-                    this.log.push(action.log || `Clicking on "${action.element}"...`)
+                    log.message = action.log || `Clicking on "${action.element}"...`
                     element = await browser.findElement(element)
                     await element.click()
                     break
 
                 case 'get_text':
-                    this.log.push(action.log || `Getting text from "${action.element}"...`)
+                    log.message = action.log || `Getting text from "${action.element}"...`
                     let elements = await browser.findElements(element)
 
                     let values = []
                     for (let i = 0; i < elements.length; i++) {
                         values.push(await elements[i].getText())
                     }
-                    this.values.push({
+                    this.result.push({
                         step: i,
                         values: values,
                     })
                     break
                 }
 
-                await this.screenshot(browser)
+                log.screenshot = await browser.takeScreenshot()
+                this.log.push(log)
+                console.log(log)
             }
 
-            this.log.push('Done.')
+            this.log.push({message: 'Done.'})
+            this.done = true
         } catch (e) {
+            this.error = `Error: ${e.message}`
             console.log(e)
             try {
-                await this.screenshot(browser)
+                // await this.screenshot(browser)
             } finally {
             }
         } finally {
+            this.running = false
             await browser.quit()
         }
-    }
-
-    async screenshot(browser) {
-        this.screenshots.push(await browser.takeScreenshot())
     }
 }

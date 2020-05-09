@@ -4,39 +4,56 @@
 
         <hr>
 
-        <ul v-for="item in log">
-            <li>{{ item }}</li>
-        </ul>
-        <div v-for="value in screenshots">
-            <img class="screenshot" :src="`data:image/png;base64,${value}`">
-        </div>
-
-        <ul v-for="value in values">
-            <li>{{ value }}</li>
-        </ul>
-
         <table v-if="tasks.length">
-            <thead>
-            <tr>
-                <th></th>
-                <th>Title</th>
-                <th>Actions</th>
-                <th></th>
-            </tr>
-            </thead>
             <tbody>
             <tr
                 v-for="(task, idx) of tasks"
                 :key="task.id"
             >
                 <td>
-                    <button class="btn btn-small blue" @click="run(task.id)">
+                    <div v-if="task.runner && task.runner.running" class="loader"></div>
+                    <button v-else class="btn btn-small blue run" @click="run(task.id)">
                         <i class="material-icons tooltipped" data-tooltip="Run">play_arrow</i>
                     </button>
+
+                    {{task.title}}
+
+                    <div v-if="task.runner">
+                        <p v-if="task.runner.running && task.runner.log.length">
+                            {{ task.runner.log[task.runner.log.length - 1].message }}
+                        </p>
+
+                        <p v-if="task.runner.done && task.runner.result.length">
+                            {{ task.runner.result }}
+                        </p>
+
+                        <p v-if="task.runner.error">
+                            {{ task.runner.error }}
+                        </p>
+
+                        <a @click="showLog(task.id)" class="waves-effect waves-light btn" >View Log</a>
+                        <div :id="`#modal${task.id}`" class="modal modal-fixed-footer">
+                            <div class="modal-content">
+                                <h4>Log</h4>
+
+                                <div v-for="item in task.runner.log" class="col s12 m7">
+                                    <div class="card">
+                                        <div class="card-content">
+                                            <p>{{ item.message }}</p>
+                                        </div>
+                                        <div class="card-image">
+                                            <img v-if="item.screenshot" class="screenshot" :src="`data:image/png;base64,${item.screenshot}`">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+                            </div>
+                        </div>
+                    </div>
                 </td>
-                <td>{{task.title}}</td>
-                <td>{{task.steps.length}}</td>
-                <td>
+                <td style="width: 20%">
                     <router-link tag="button" class="btn btn-small" :to="'/task/' + task.id">
                         Edit
                     </router-link>
@@ -50,22 +67,14 @@
 </template>
 
 <script>
-    // import M from 'materialize-css'
+    import M from 'materialize-css'
     import Selenium from '../../Selenium'
-    let selenium = new Selenium()
 
     export default {
         data() {
             return {
-                log: selenium.log,
-                screenshots: selenium.screenshots,
-                values: selenium.values,
+                tasks: this.$store.getters.tasks,
             }
-        },
-        computed: {
-            tasks() {
-                return this.$store.getters.tasks
-            },
         },
         methods: {
             remove(taskId) {
@@ -73,10 +82,29 @@
                     this.$store.dispatch('deleteTask', taskId)
                 }
             },
+            showLog(taskId) {
+                if (this.modal) {
+                    this.modal.destroy()
+                }
+                this.modal = M.Modal.init(document.getElementById(`#modal${taskId}`))
+                this.modal.open()
+            },
             run(taskId) {
-                const task = this.$store.getters.taskById(taskId)
-                selenium.steps = task.steps
-                selenium.run()
+                let tasks = this.tasks.concat()
+                const idx = tasks.findIndex(t => t.id === taskId)
+                const task = tasks[idx]
+                task.runner = new Selenium()
+                task.runner.steps = task.steps
+                task.runner.run()
+                tasks[idx] = task
+                this.tasks = tasks
+                this.updateStatus(taskId)
+            },
+            updateStatus(taskId) {
+                this.tasks = this.tasks.concat()
+                setTimeout(() => {
+                    this.updateStatus(taskId)
+                }, 300)
             }
         },
         mounted() {
@@ -86,8 +114,8 @@
 </script>
 
 <style lang="scss" scoped>
-    .td {
-        max-width: 400px;
+    td {
+        vertical-align: top;
     }
 
     .text {
@@ -96,7 +124,23 @@
         overflow: hidden;
     }
 
-    .screenshot {
-        max-width: 600px;
+    .run {
+        padding: 0 7px;
+    }
+
+    .loader {
+        border: 5px solid #f3f3f3; /* Light grey */
+        border-top: 5px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        animation: spin 2s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>
