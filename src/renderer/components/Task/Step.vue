@@ -3,7 +3,7 @@
         <div class="collapsible-header truncate">
             <div v-html="getStepHeader()"></div>
             <div class="indicators">
-                <i @click="remove" class="tiny material-icons tooltipped" data-tooltip="Delete">delete</i>
+                <i @click.stop="remove" class="tiny material-icons tooltipped" data-tooltip="Delete">delete</i>
             </div>
         </div>
         <div class="collapsible-body">
