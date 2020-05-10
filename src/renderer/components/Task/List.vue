@@ -16,7 +16,7 @@
                         <i class="material-icons tooltipped" data-tooltip="Run">play_arrow</i>
                     </button>
 
-                    {{task.title}}
+                    <span class="title">{{task.title}}</span>
 
                     <div v-if="task.runner">
                         <p v-if="task.runner.running">
@@ -98,17 +98,25 @@
                 task.runner.run()
                 tasks[idx] = task
                 this.tasks = tasks
+                if (this.updateStatusTimeout) {
+                    clearTimeout(this.updateStatusTimeout)
+                }
                 this.updateStatus(taskId)
             },
             updateStatus(taskId) {
                 this.tasks = this.tasks.concat()
-                setTimeout(() => {
+                this.updateStatusTimeout = setTimeout(() => {
                     this.updateStatus(taskId)
                 }, 300)
             }
         },
         mounted() {
             // M.FormSelect.init(this.$refs.select)
+        },
+        destroyed() {
+            if (this.updateStatusTimeout) {
+                clearTimeout(this.updateStatusTimeout)
+            }
         }
     }
 </script>
@@ -126,6 +134,10 @@
 
     .run {
         padding: 0 7px;
+    }
+
+    .title {
+        padding-left: 5px;
     }
 
     .loader {
