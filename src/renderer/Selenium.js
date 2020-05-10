@@ -1,5 +1,6 @@
 export default class Selenium {
     constructor() {
+        this.message = null
         this.log = []
         this.result = []
         this.error = null
@@ -13,7 +14,9 @@ export default class Selenium {
 
     async run() {
         this.running = true
-        this.log.push({'message': 'Opening browser...'})
+        this.message = 'Opening browser...'
+        this.log.push({'message': this.message})
+
         const webdriver = require('selenium-webdriver')
         const browser = new webdriver.Builder()
             .usingServer('http://localhost:4444/wd/hub/')
@@ -24,7 +27,6 @@ export default class Selenium {
 
         try {
             for (let i = 0; i < this.actions.length; i++) {
-                let log = {}
                 let element
                 let action = this.actions[i]
 
@@ -38,29 +40,29 @@ export default class Selenium {
 
                 switch (action.action) {
                 case 'load_site':
-                    log.message = `Loading "${action.url}"...`
+                    this.message = `Loading "${action.url}"...`
                     await browser.get(action.url)
                     break
 
                 case 'wait_for_element':
-                    log.message = action.log || `Waiting for element "${action.element}"...`
+                    this.message = action.log || `Waiting for element "${action.element}"...`
                     await browser.wait(webdriver.until.elementLocated(element), 15 * 1000)
                     break
 
                 case 'type':
-                    log.message = `Typing "${action.text}" to "${action.element}"...`
+                    this.message = `Typing "${action.text}" to "${action.element}"...`
                     let input = await browser.findElement(element)
                     input.sendKeys(action.text)
                     break
 
                 case 'click':
-                    log.message = action.log || `Clicking on "${action.element}"...`
+                    this.message = action.log || `Clicking on "${action.element}"...`
                     element = await browser.findElement(element)
                     await element.click()
                     break
 
                 case 'get_text':
-                    log.message = action.log || `Getting text from "${action.element}"...`
+                    this.message = action.log || `Getting text from "${action.element}"...`
                     let elements = await browser.findElements(element)
 
                     let values = []
@@ -74,12 +76,15 @@ export default class Selenium {
                     break
                 }
 
-                log.screenshot = await browser.takeScreenshot()
-                this.log.push(log)
-                console.log(log)
+                this.log.push({
+                    message: this.message,
+                    screenshot: await browser.takeScreenshot()
+                })
+                console.log(this.message)
             }
 
-            this.log.push({message: 'Done.'})
+            this.message = 'Done.'
+            this.log.push({message: this.message})
             this.done = true
         } catch (e) {
             this.error = `Error: ${e.message}`

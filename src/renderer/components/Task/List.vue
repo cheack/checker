@@ -19,8 +19,8 @@
                     {{task.title}}
 
                     <div v-if="task.runner">
-                        <p v-if="task.runner.running && task.runner.log.length">
-                            {{ task.runner.log[task.runner.log.length - 1].message }}
+                        <p v-if="task.runner.running">
+                            {{ task.runner.message }}
                         </p>
 
                         <p v-if="task.runner.done && task.runner.result.length">
