@@ -4,6 +4,10 @@
         <h1 v-else>Edit Task</h1>
 
         <form @submit.prevent="submitHandler">
+            <div class="row" v-if="error">
+                <Alert :type="'warning'" :message="'Warning'" :info="error"/>
+            </div>
+
             <div class="input-field">
                 <input id="title" v-model="title" type="text" class="validate" required>
                 <label for="title">Title</label>
@@ -39,6 +43,7 @@
 <script>
     import M from 'materialize-css'
     import Step from './Step'
+    import Alert from '../Alert'
 
     export default {
         name: 'task',
@@ -47,9 +52,10 @@
                 return this.$store.getters.taskById(+this.$route.params.id) || {steps: []}
             }
         },
-        components: {Step},
+        components: {Step, Alert},
         data: () => ({
             isNew: true,
+            error: '',
             title: '',
             steps: [],
         }),
@@ -96,6 +102,10 @@
                 this.steps = steps
             },
             submitHandler() {
+                if (!this.steps.length) {
+                    this.error = 'add at least one action.'
+                    return
+                }
                 const task = {
                     id: this.task.id,
                     title: this.title,
