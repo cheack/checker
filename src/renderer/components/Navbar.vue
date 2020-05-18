@@ -1,26 +1,25 @@
 <template>
-  <nav class="blue darken-3">
-    <div class="nav-wrapper">
-      <router-link to="/" class="brand-logo">Checkers</router-link>
-      <ul class="right hide-on-med-and-down">
-        <router-link
-          tag="li"
-          to="/create"
-          exact
-          active-class="active"
-        >
-          <a href="#">Create</a>
-        </router-link>
-        <router-link
-          tag="li"
-          to="/list"
-          active-class="active"
-        >
-          <a href="#">List</a>
-        </router-link>
-      </ul>
-    </div>
-  </nav>
+  <div class="ui visible left vertical thin sidebar menu inverted">
+    <router-link
+        to="/create"
+        exact
+        class="item"
+        active-class="active"
+    >
+      <i class="add layout icon"></i>
+      New task
+    </router-link>
+
+    <router-link
+        to="/"
+        exact
+        class="item"
+        active-class="active"
+      >
+      <i class="list layout icon"></i>
+      All tasks
+    </router-link>
+  </div>
 </template>
 
 <script>
@@ -28,7 +27,5 @@ export default {}
 </script>
 
 <style lang="scss" scoped>
-  nav {
-    padding: 0 2rem;
-  }
+
 </style>

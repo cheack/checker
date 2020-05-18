@@ -1,8 +1,10 @@
 <template>
     <div id="app">
         <Navbar />
-        <div class="container">
+        <div class="pusher">
+            <div class="ui container">
             <router-view :key="$route.path"/>
+            </div>
         </div>
     </div>
 </template>
@@ -16,6 +18,9 @@
 </script>
 
 <style lang="scss">
-    @import "~materialize-css/dist/css/materialize.min.css";
-    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+    @import "~fomantic-ui/dist/semantic.min.css";
+
+    .sidebar.visible + .pusher {
+        width: calc(100% - 150px);
+    }
 </style>

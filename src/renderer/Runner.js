@@ -1,4 +1,4 @@
-export default class Selenium {
+export default class Runner {
     constructor() {
         this.message = null
         this.log = []
