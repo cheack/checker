@@ -9,15 +9,19 @@
                 <input v-model="title" type="text" class="validate" name="title">
             </div>
 
-            <div v-if="steps.length" class="ui styled accordion" ref="accordion">
+            <draggable v-if="steps.length" class="ui styled accordion"
+                :list="steps"
+                v-bind="dragOptions"
+                :component-data="getAccordionData()"
+            >
                 <Step
-                    v-for="(step, idx) in steps"
-                    :key="idx"
+                    v-for="(step) in steps"
+                    :key="step.order"
                     :initial-step="step"
                     @update="sync"
                     @delete="deleteStep"
                 />
-            </div>
+            </draggable>
             <p v-else>
                 No actions
             </p>
@@ -40,15 +44,21 @@
 
 <script>
     import Step from './Step'
+    import draggable from 'vuedraggable'
 
     export default {
         name: 'task',
         computed: {
             task() {
                 return this.$store.getters.taskById(+this.$route.params.id) || {steps: []}
+            },
+            dragOptions() {
+                return {
+                    ghostClass: 'ghost'
+                }
             }
         },
-        components: {Step},
+        components: {Step, draggable},
         data: () => ({
             isNew: true,
             title: '',
@@ -57,11 +67,16 @@
         }),
         mounted() {
             this.title = this.task.title
-            this.steps = this.task.steps
+            let steps = JSON.parse(JSON.stringify(this.task.steps))
+            steps.forEach(function (element, index) {
+                element.order = index + 1
+            })
+
+            this.steps = steps
             this.isNew = !this.task.id
 
             this.$nextTick(function () {
-                $(this.$refs.accordion).accordion()
+                $('[ref=accordion]').accordion()
                 $(this.$refs.form)
                     .form({
                         fields: {
@@ -81,6 +96,13 @@
             })
         },
         methods: {
+            getAccordionData() {
+                return {
+                    attrs: {
+                        ref: 'accordion'
+                    },
+                }
+            },
             sync: function(stepData) {
                 let index = this.steps.findIndex((step) => step.id === stepData.id)
                 this.steps[index] = stepData
@@ -98,7 +120,7 @@
                 this.stepsError = false
 
                 this.$nextTick(function () {
-                    $(this.$refs.accordion).accordion('refresh').accordion('open', this.steps.length - 1)
+                    $('[ref=accordion]').accordion('refresh').accordion('open', this.steps.length - 1)
                 })
             },
             deleteStep: function(stepId) {
@@ -126,11 +148,22 @@
         },
     }
 </script>
-<style scoped>
+<style lang="scss" scoped>
     .accordion {
         margin-bottom: 10px;
+
+        > div {
+            background: white;
+        }
     }
-    [name=steps] {
-        display: none;
+
+    .button {
+        margin-top: 35px;
     }
+
+    .ghost {
+        opacity: 0.5;
+        background: #c8ebfb !important;
+    }
+
 </style>

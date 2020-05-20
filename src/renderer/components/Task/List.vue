@@ -11,7 +11,7 @@
                 :key="idx"
             >
                 <td>
-                    <button class="ui blue icon button" :class="{loading: task.runner && task.runner.running}" @click="run(task.id)">
+                    <button class="ui blue icon button" :class="{loading: isRunning(task.id)}" :disabled="isRunning(task.id)" @click="run(task.id)">
                         <i class="play icon"></i>
                     </button>
 
@@ -52,6 +52,9 @@
             }
         },
         methods: {
+            isRunning(taskId) {
+                return this.runners[taskId] && this.runners[taskId].running
+            },
             remove(taskId) {
                 if (confirm('Are you sure?')) {
                     this.$store.dispatch('deleteTask', taskId)

@@ -6,13 +6,13 @@
 
         <p v-if="runner.done && runner.result.length">
             {{ runner.result }}
+            <a @click="showLog(taskId)">View Log</a>
         </p>
 
         <p v-if="runner.error">
             {{ runner.error }}
         </p>
 
-        <a @click="showLog(taskId)">View Log</a>
         <div class="ui modal" :id="`modal${taskId}`">
             <i class="close icon"></i>
             <div class="header">
