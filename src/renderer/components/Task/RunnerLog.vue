@@ -6,19 +6,19 @@
 
         <p v-if="runner.done && runner.result.length">
             {{ runner.result }}
-            <a @click="showLog(taskId)">View Log</a>
         </p>
 
         <p v-if="runner.error">
             {{ runner.error }}
         </p>
 
-        <div class="ui modal" :id="`modal${taskId}`">
+        <a @click="showLog(taskId)">View Log</a>
+        <div class="ui longer modal" :id="`modal${taskId}`">
             <i class="close icon"></i>
             <div class="header">
                 Log
             </div>
-            <div class="content">
+            <div class="scrolling content">
                 <div v-for="item in runner.log"  class="ui card fluid">
                     <div class="content">
                         {{ item.message }}
@@ -29,8 +29,7 @@
                 </div>
             </div>
             <div class="actions">
-                <div class="ui button">Cancel</div>
-                <div class="ui button">OK</div>
+                <div class="ui deny button">Close</div>
             </div>
         </div>
     </div>
