@@ -30,6 +30,13 @@ function createWindow() {
     mainWindow.on('closed', () => {
         mainWindow = null
     })
+
+    let webContents = mainWindow.webContents
+    webContents.on('did-finish-load', () => {
+        webContents.setZoomFactor(1)
+        webContents.setVisualZoomLevelLimits(1, 1)
+        webContents.setLayoutZoomLevelLimits(0, 0)
+    })
 }
 
 app.on('ready', createWindow)
