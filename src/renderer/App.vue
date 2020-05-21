@@ -24,7 +24,7 @@
         width: calc(100% - 150px);
     }
 
-    *, *::after, *::before {
+    a {
         -webkit-user-select: none;
         -webkit-user-drag: none;
         -webkit-app-region: no-drag;
