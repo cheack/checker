@@ -66,6 +66,7 @@
                 url: this.initialStep.url || '',
                 xpath: this.initialStep.xpath || false,
                 log: this.initialStep.log || '',
+                order: this.initialStep.order || 1,
             }
         },
         computed: {
@@ -78,6 +79,7 @@
                     url: this.url,
                     xpath: this.xpath,
                     log: this.log,
+                    order: this.order,
                 }
             }
         },

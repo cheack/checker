@@ -115,7 +115,7 @@
                     }
                 }
                 let steps = this.steps.concat()
-                steps.push({id: this.steps.length + 1})
+                steps.push({id: this.steps.length + 1, order: this.steps.length + 1})
                 this.steps = steps
                 this.stepsError = false
 
