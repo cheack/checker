@@ -10,7 +10,7 @@
         <div class="ui form content">
             <div class="field">
                 <label>Action</label>
-                <select ref="action" v-model="action" class="ui fluid dropdown">
+                <select ref="action" v-model="action" class="ui dropdown">
                     <option value="">Choose your action</option>
                     <option value="load_site">Load Site</option>
                     <option value="type">Type text</option>
@@ -113,6 +113,9 @@
                 }
             },
         },
+        mounted() {
+            $(this.$refs.action).dropdown()
+        }
     }
 </script>
 
