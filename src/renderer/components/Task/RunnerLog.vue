@@ -1,25 +1,12 @@
 <template>
     <div>
-        <p v-if="runner.running">
-            {{ runner.message }}
-        </p>
-
-        <p v-if="runner.done && runner.result.length">
-            {{ runner.result }}
-        </p>
-
-        <p v-if="runner.error">
-            {{ runner.error }}
-        </p>
-
-        <a @click="showLog(taskId)">View Log</a>
-        <div class="ui longer modal" :id="`modal${taskId}`">
+        <div class="ui longer modal" :id="`modal${modalRef}`">
             <i class="close icon"></i>
             <div class="header">
                 Log
             </div>
             <div class="scrolling content">
-                <div v-for="item in runner.log"  class="ui card fluid">
+                <div v-for="item in log.log"  class="ui card fluid">
                     <div class="content">
                         {{ item.message }}
                     </div>
@@ -38,10 +25,15 @@
 <script>
     export default {
         name: 'runner_log',
-        props: ['taskId', 'runner'],
+        props: ['log'],
+        data() {
+            return {
+                modalRef: Math.random().toString(36).slice(2)
+            }
+        },
         methods: {
-            showLog(taskId) {
-                $(`#modal${taskId}`).modal('show')
+            show() {
+                $(`#modal${this.modalRef}`).modal('show')
             },
         },
     }

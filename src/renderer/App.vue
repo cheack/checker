@@ -28,6 +28,12 @@
         -webkit-user-select: none;
         -webkit-user-drag: none;
         -webkit-app-region: no-drag;
-        cursor: default;
+    }
+
+    a, a:hover {
+        text-decoration: none;
+        color: inherit;
+        outline: 0;
+        cursor:pointer
     }
 </style>

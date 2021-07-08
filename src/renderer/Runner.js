@@ -80,7 +80,6 @@ export default class Runner {
                     message: this.message,
                     screenshot: await browser.takeScreenshot()
                 })
-                console.log(this.message)
             }
 
             this.message = 'Done.'
