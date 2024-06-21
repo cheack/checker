@@ -1,28 +1,30 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import List from '../components/Task/List.vue'
+import Task from '../components/Task/Task.vue'
 
-Vue.use(Router)
+const routes = [
+    {
+        path: '/',
+        name: 'list',
+        component: List
+    },
+    {
+        path: '/create',
+        name: 'create',
+        component: Task
+    },
+    {
+        path: '/task/:id',
+        name: 'task',
+        component: Task
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: '/'
+    },
+]
 
-export default new Router({
-    routes: [
-        {
-            path: '/',
-            name: 'list',
-            component: require('@/components/Task/List').default
-        },
-        {
-            path: '/create',
-            name: 'create',
-            component: require('@/components/Task/Task').default
-        },
-        {
-            path: '/task/:id',
-            name: 'task',
-            component: require('@/components/Task/Task').default
-        },
-        {
-            path: '*',
-            redirect: '/'
-        },
-    ]
+export const router = createRouter({
+    history: createMemoryHistory(),
+    routes,
 })

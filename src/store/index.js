@@ -1,11 +1,5 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 
-import modules from './modules'
+import { config } from './modules/Task'
 
-Vue.use(Vuex)
-
-export default new Vuex.Store({
-    modules,
-    strict: process.env.NODE_ENV !== 'production'
-})
+export const store = createStore(config)

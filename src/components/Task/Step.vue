@@ -60,6 +60,7 @@
 
 <script>
     import M from 'materialize-css'
+    import { escapeHtml} from "../../util";
 
     export default {
         name: 'step',
@@ -97,9 +98,9 @@
         },
         methods: {
             getStepHeader() {
-                let url = this.escapeHtml(this.url || '')
-                let element = this.escapeHtml(this.element || '')
-                let text = this.escapeHtml(this.text || '')
+                let url = escapeHtml(this.url || '')
+                let element = escapeHtml(this.element || '')
+                let text = escapeHtml(this.text || '')
 
                 switch (this.action) {
                 case 'load_site':

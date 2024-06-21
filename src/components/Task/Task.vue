@@ -42,8 +42,8 @@
 
 <script>
     import M from 'materialize-css'
-    import Step from './Step'
-    import Alert from '../Alert'
+    import Step from './Step.vue'
+    import Alert from '../Alert.vue'
 
     export default {
         name: 'task',

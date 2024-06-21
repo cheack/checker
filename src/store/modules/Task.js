@@ -37,7 +37,7 @@ const actions = {
     },
 }
 
-export default {
+export const config = {
     state,
     mutations,
     actions,

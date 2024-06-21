@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div>
         <Navbar />
         <div class="container">
             <router-view :key="$route.path"/>
@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import Navbar from './components/Navbar'
+    import Navbar from "./components/Navbar.vue";
     export default {
         name: 'checker',
         components: {Navbar}
@@ -16,6 +16,6 @@
 </script>
 
 <style lang="scss">
-    @import "~materialize-css/dist/css/materialize.min.css";
+    @import "../node_modules/materialize-css/dist/css/materialize.min.css";
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 </style>
