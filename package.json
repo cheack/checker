@@ -32,12 +32,13 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.0.0",
-    "fomantic-ui": "^2.9.3",
-    "materialize-css": "^1.0.0-rc.2",
     "sass": "^1.77.6",
     "selenium-webdriver": "^4.22.0",
+    "vue": "^3.4.29",
     "vue-router": "^4.3.3",
     "vuedraggable": "^2.24.3",
     "vuex": "^4.1.0"

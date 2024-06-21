@@ -1,9 +1,9 @@
 <template>
     <div>
         <Navbar />
-        <div class="pusher">
-            <div class="ui container">
-            <router-view :key="$route.path"/>
+        <div class="d-flex flex-column">
+            <div class="container my-4">
+                <router-view :key="$route.path"/>
             </div>
         </div>
     </div>
@@ -18,8 +18,6 @@
 </script>
 
 <style lang="scss">
-    @import "../node_modules/fomantic-ui/dist/semantic.min.css";
-
     .sidebar.visible + .pusher {
         width: calc(100% - 150px);
     }

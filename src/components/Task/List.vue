@@ -4,7 +4,7 @@
 
         <hr>
 
-        <table v-if="tasks.length" class="ui celled table">
+        <table v-if="tasks.length" class="table table-bordered">
             <tbody>
             <tr
                 v-for="(task, idx) of tasks"
@@ -12,28 +12,28 @@
             >
                 <td>
                     <p v-if="task.lastLog">
-                        <a @click="showLog(`lastLog${task.id}`)"><i class="camera icon" title="Show last log" ></i></a>
+                        <a @click="showLog(`lastLog${task.id}`)"><i class="bi bi-camera" title="Show last log"></i></a>
                         <RunnerLog :log="task.lastLog" :ref="`lastLog${task.id}`"/>
                     </p>
 
-                    <button class="ui blue icon button" :class="{loading: isRunning(task.id)}" :disabled="isRunning(task.id)" @click="run(task.id)">
-                        <i class="play icon"></i>
+                    <button class="btn btn-primary" :class="{ 'spinner-border': isRunning(task.id) }" :disabled="isRunning(task.id)" @click="run(task.id)">
+                        <i class="bi bi-play"></i>
                     </button>
 
                     <span class="title">{{task.title}}</span>
 
                     <RunnerProgress v-if="runners[task.id]"
-                        :runner="runners[task.id]"
-                        :task-id="task.id"
-                        :last-log="task.lastLog"
-                        @update="saveLog"
+                                    :runner="runners[task.id]"
+                                    :task-id="task.id"
+                                    :last-log="task.lastLog"
+                                    @update="saveLog"
                     />
                 </td>
                 <td style="width: 20%">
-                    <router-link tag="button" class="ui button" :to="'/task/' + task.id">
+                    <router-link tag="button" class="btn btn-secondary" :to="'/task/' + task.id">
                         Edit
                     </router-link>
-                    <button class="ui red button" @click="remove(task.id)">Delete</button>
+                    <button class="btn btn-danger" @click="remove(task.id)">Delete</button>
                 </td>
             </tr>
             </tbody>
@@ -41,6 +41,7 @@
         <p v-else>No tasks</p>
     </div>
 </template>
+
 
 <script>
     import Runner from '../../Runner'

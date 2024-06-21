@@ -3,17 +3,17 @@
         <h1 v-if="isNew">New Task</h1>
         <h1 v-else>Edit Task</h1>
 
-        <form class="ui form" ref="form">
-            <div class="field">
-                <label>Title</label>
-                <input v-model="title" type="text" class="validate" name="title">
+        <form class="needs-validation" ref="form" novalidate>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input v-model="title" type="text" class="form-control" id="title" name="title" required>
+                <div class="invalid-feedback">
+                    Title is required.
+                </div>
             </div>
 
-            <draggable v-if="steps.length" class="ui styled accordion"
-                :list="steps"
-                v-bind="dragOptions"
-                :component-data="getAccordionData()"
-            >
+
+            <div v-if="steps.length"  class="accordion" id="accordionExample">
                 <Step
                     v-for="(step) in steps"
                     :key="step.order"
@@ -21,30 +21,37 @@
                     @update="sync"
                     @delete="deleteStep"
                 />
-            </draggable>
+            </div>
+<!--            <draggable v-if="steps.length" class="accordion"-->
+<!--                       :list="steps"-->
+<!--                       v-bind="dragOptions"-->
+<!--                       :component-data="getAccordionData()"-->
+<!--            >-->
+
+<!--            </draggable>-->
             <p v-else>
                 No actions
             </p>
 
-            <a @click.stop="addStep" class="ui button">
-                <i class="add icon"></i>
+            <button type="button" @click.stop="addStep" class="btn btn-primary mb-3">
+                <i class="bi bi-plus-lg"></i>
                 Add Action
-            </a>
-            <div v-if="stepsError" class="field error">
-                <div class="ui red pointing prompt label">Add at least one action</div>
+            </button>
+            <div v-if="stepsError" class="mb-3">
+                <div class="alert alert-danger">Add at least one action</div>
             </div>
             <hr>
-            <div class="ui submit button">
+            <button type="submit" class="btn btn-success">
                 <span v-if="isNew">Create</span>
                 <span v-else>Update</span>
-            </div>
+            </button>
         </form>
     </div>
 </template>
 
 <script>
     import Step from './Step.vue'
-    import draggable from 'vuedraggable'
+    // import draggable from 'vuedraggable'
 
     export default {
         name: 'task',
@@ -58,7 +65,10 @@
                 }
             }
         },
-        components: {Step, draggable},
+        components: {
+            Step,
+            // draggable,
+        },
         data: () => ({
             isNew: true,
             title: '',
@@ -76,23 +86,23 @@
             this.isNew = !this.task.id
 
             this.$nextTick(function () {
-                $('[ref=accordion]').accordion()
-                $(this.$refs.form)
-                    .form({
-                        fields: {
-                            title: {
-                                rules: [
-                                    {
-                                        type: 'empty',
-                                        prompt: 'Enter a title',
-                                    }
-                                ]
-                            },
-                        },
-                        inline: true,
-                        on: 'submit',
-                        onSuccess: this.submitHandler,
-                    })
+                // $('[ref=accordion]').accordion()
+                // $(this.$refs.form)
+                //     .form({
+                //         fields: {
+                //             title: {
+                //                 rules: [
+                //                     {
+                //                         type: 'empty',
+                //                         prompt: 'Enter a title',
+                //                     }
+                //                 ]
+                //             },
+                //         },
+                //         inline: true,
+                //         on: 'submit',
+                //         onSuccess: this.submitHandler,
+                //     })
             })
         },
         methods: {
@@ -120,7 +130,7 @@
                 this.stepsError = false
 
                 this.$nextTick(function () {
-                    $('[ref=accordion]').accordion('refresh').accordion('open', this.steps.length - 1)
+                    // $('[ref=accordion]').accordion('refresh').accordion('open', this.steps.length - 1)
                 })
             },
             deleteStep: function(stepId) {
