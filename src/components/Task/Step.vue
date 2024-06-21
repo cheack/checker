@@ -1,65 +1,57 @@
 <template>
-    <li>
-        <div class="collapsible-header truncate">
-            <div v-html="getStepHeader()"></div>
+    <div>
+        <div class="title">
+            <i class="dropdown icon"></i>
+            <div class="step-title" v-html="getStepHeader()"></div>
             <div class="indicators">
-                <i @click.stop="remove" class="tiny material-icons tooltipped" data-tooltip="Delete">delete</i>
+                <i @click.stop="remove" class="red trash icon" title="Delete"></i>
             </div>
         </div>
-        <div class="collapsible-body">
-            <div class="row">
-                <div class="input-field col s6">
-                    <select ref="action" v-model="action">
-                        <option value="" disabled selected>Choose your action</option>
-                        <option value="load_site">Load Site</option>
-                        <option value="type">Type text</option>
-                        <option value="click">Click on element</option>
-                        <option value="wait_for_element">Wait for element</option>
-                        <option value="get_text">Get element text</option>
-                    </select>
-                    <label>Action</label>
+        <div class="ui form content">
+            <div class="field">
+                <label>Action</label>
+                <select ref="action" v-model="action" class="ui dropdown">
+                    <option value="">Choose your action</option>
+                    <option value="load_site">Load Site</option>
+                    <option value="type">Type text</option>
+                    <option value="click">Click on element</option>
+                    <option value="wait_for_element">Wait for element</option>
+                    <option value="get_text">Get element text</option>
+                </select>
+            </div>
+
+            <div v-if="action === 'load_site'" class="field">
+                <label>URL</label>
+                <input type="text" v-model="url">
+            </div>
+
+            <div v-if="['type', 'click', 'wait_for_element', 'get_text'].includes(action)" class="two fields">
+                <div class="twelve wide field">
+                    <label>Element</label>
+                    <input type="text" v-model="element">
+                </div>
+                <div class="four wide field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" :checked="xpath" v-model="xpath" class="hidden" :id="`xpath${id}`"/>
+                        <label :for="`xpath${id}`">xpath</label>
+                    </div>
                 </div>
             </div>
 
-            <div v-if="action === 'load_site'" class="row">
-                <div class="input-field col s6">
-                    <input type="text" v-model="url" :id="`url${id}`">
-                    <label :for="`url${id}`">URL</label>
-                </div>
+            <div v-if="action === 'type'" class="field">
+                <label>Text to type</label>
+                <input type="text" v-model="text">
             </div>
 
-            <div v-if="['type', 'click', 'wait_for_element', 'get_text'].includes(action)" class="row">
-                <div class="input-field col s6">
-                    <input type="text" v-model="element" :id="`element${id}`">
-                    <label :for="`element${id}`">Element</label>
-                </div>
-                <p>
-                    <label>
-                        <input type="checkbox" :checked="xpath" v-model="xpath"/>
-                        <span>xpath</span>
-                    </label>
-                </p>
-            </div>
-
-            <div v-if="action === 'type'" class="row">
-                <div class="input-field col s6">
-                    <input type="text" v-model="text" :id="`text${id}`">
-                    <label :for="`text${id}`">Text to type</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s6">
-                    <input type="text" v-model="log" :id="`log${id}`">
-                    <label :for="`log${id}`">Custom log text</label>
-                </div>
+            <div class="field">
+                <label>Custom log text</label>
+                <input type="text" v-model="log">
             </div>
         </div>
-    </li>
+    </div>
 </template>
 
 <script>
-    import M from 'materialize-css'
     import { escapeHtml} from "../../util";
 
     export default {
@@ -76,6 +68,7 @@
                 url: this.initialStep.url || '',
                 xpath: this.initialStep.xpath || false,
                 log: this.initialStep.log || '',
+                order: this.initialStep.order || 1,
             }
         },
         computed: {
@@ -88,6 +81,7 @@
                     url: this.url,
                     xpath: this.xpath,
                     log: this.log,
+                    order: this.order,
                 }
             }
         },
@@ -122,40 +116,26 @@
                     this.$emit('delete', this.id)
                 }
             },
-            updateMaterialize() {
-                M.updateTextFields()
-                this.tooltips = M.Tooltip.init(document.querySelectorAll('.tooltipped'))
-                this.formSelect = M.FormSelect.init(this.$refs.action)
-            }
-        },
-        updated() {
-            this.updateMaterialize()
         },
         mounted() {
-            this.updateMaterialize()
-        },
-        destroyed() {
-            if (this.formSelect && this.formSelect.destroy) {
-                this.formSelect.destroy()
-            }
-            if (this.tooltips) {
-                this.tooltips.forEach((el) => { el.destroy() })
-            }
+            $(this.$refs.action).dropdown()
         }
     }
 </script>
 
 <style lang="scss" >
-    .collapsible-header {
-        position: relative;
+    .title * {
+        color: rgba(0,0,0,.95);
+    }
+    .step-title {
+        display: inline;
+        font-weight: normal;
 
         span {
             font-weight: bold;
         }
-
-        .indicators {
-            position: absolute;
-            right: 0;
-        }
+    }
+    .indicators {
+        float: right;
     }
 </style>

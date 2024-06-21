@@ -1,4 +1,4 @@
-export default class Selenium {
+export default class Runner {
     constructor() {
         this.message = null
         this.log = []
@@ -80,7 +80,6 @@ export default class Selenium {
                     message: this.message,
                     screenshot: await browser.takeScreenshot()
                 })
-                console.log(this.message)
             }
 
             this.message = 'Done.'

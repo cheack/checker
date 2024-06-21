@@ -1,8 +1,10 @@
 <template>
     <div>
         <Navbar />
-        <div class="container">
+        <div class="pusher">
+            <div class="ui container">
             <router-view :key="$route.path"/>
+            </div>
         </div>
     </div>
 </template>
@@ -16,6 +18,22 @@
 </script>
 
 <style lang="scss">
-    @import "../node_modules/materialize-css/dist/css/materialize.min.css";
-    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+    @import "../node_modules/fomantic-ui/dist/semantic.min.css";
+
+    .sidebar.visible + .pusher {
+        width: calc(100% - 150px);
+    }
+
+    a {
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
+        -webkit-app-region: no-drag;
+    }
+
+    a, a:hover {
+        text-decoration: none;
+        color: inherit;
+        outline: 0;
+        cursor:pointer
+    }
 </style>

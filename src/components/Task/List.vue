@@ -4,60 +4,36 @@
 
         <hr>
 
-        <table v-if="tasks.length">
+        <table v-if="tasks.length" class="ui celled table">
             <tbody>
             <tr
                 v-for="(task, idx) of tasks"
-                :key="task.id"
+                :key="idx"
             >
                 <td>
-                    <div v-if="task.runner && task.runner.running" class="loader"></div>
-                    <button v-else class="btn btn-small blue run" @click="run(task.id)">
-                        <i class="material-icons tooltipped" data-tooltip="Run">play_arrow</i>
+                    <p v-if="task.lastLog">
+                        <a @click="showLog(`lastLog${task.id}`)"><i class="camera icon" title="Show last log" ></i></a>
+                        <RunnerLog :log="task.lastLog" :ref="`lastLog${task.id}`"/>
+                    </p>
+
+                    <button class="ui blue icon button" :class="{loading: isRunning(task.id)}" :disabled="isRunning(task.id)" @click="run(task.id)">
+                        <i class="play icon"></i>
                     </button>
 
                     <span class="title">{{task.title}}</span>
 
-                    <div v-if="task.runner">
-                        <p v-if="task.runner.running">
-                            {{ task.runner.message }}
-                        </p>
-
-                        <p v-if="task.runner.done && task.runner.result.length">
-                            {{ task.runner.result }}
-                        </p>
-
-                        <p v-if="task.runner.error">
-                            {{ task.runner.error }}
-                        </p>
-
-                        <a @click="showLog(task.id)" class="waves-effect waves-light btn" >View Log</a>
-                        <div :id="`#modal${task.id}`" class="modal modal-fixed-footer">
-                            <div class="modal-content">
-                                <h4>Log</h4>
-
-                                <div v-for="item in task.runner.log" class="col s12 m7">
-                                    <div class="card">
-                                        <div class="card-content">
-                                            <p>{{ item.message }}</p>
-                                        </div>
-                                        <div class="card-image">
-                                            <img v-if="item.screenshot" class="screenshot" :src="`data:image/png;base64,${item.screenshot}`">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-                            </div>
-                        </div>
-                    </div>
+                    <RunnerProgress v-if="runners[task.id]"
+                        :runner="runners[task.id]"
+                        :task-id="task.id"
+                        :last-log="task.lastLog"
+                        @update="saveLog"
+                    />
                 </td>
                 <td style="width: 20%">
-                    <router-link tag="button" class="btn btn-small" :to="'/task/' + task.id">
+                    <router-link tag="button" class="ui button" :to="'/task/' + task.id">
                         Edit
                     </router-link>
-                    <button class="btn btn-small red" @click="remove(task.id)">Delete</button>
+                    <button class="ui red button" @click="remove(task.id)">Delete</button>
                 </td>
             </tr>
             </tbody>
@@ -67,57 +43,45 @@
 </template>
 
 <script>
-    import M from 'materialize-css'
-    import Selenium from '../../Selenium'
+    import Runner from '../../Runner'
+    import RunnerLog from './RunnerLog.vue'
+    import RunnerProgress from './RunnerProgress.vue'
 
     export default {
+        components: { RunnerLog, RunnerProgress },
+        computed: {
+            tasks() {
+                return this.$store.getters.tasks
+            }
+        },
         data() {
             return {
-                tasks: this.$store.getters.tasks,
+                runners: {},
             }
         },
         methods: {
+            saveLog: function(log) {
+                this.$store.dispatch('setTaskLog', log)
+            },
+            showLog: function(ref) {
+                this.$refs[ref][0].show()
+            },
+            isRunning(taskId) {
+                return this.runners[taskId] && this.runners[taskId].running
+            },
             remove(taskId) {
                 if (confirm('Are you sure?')) {
                     this.$store.dispatch('deleteTask', taskId)
                 }
             },
-            showLog(taskId) {
-                if (this.modal) {
-                    this.modal.destroy()
-                }
-                this.modal = M.Modal.init(document.getElementById(`#modal${taskId}`))
-                this.modal.open()
-            },
             run(taskId) {
-                let tasks = this.tasks.concat()
-                const idx = tasks.findIndex(t => t.id === taskId)
-                const task = tasks[idx]
-                task.runner = new Selenium()
-                task.runner.steps = task.steps
-                task.runner.run()
-                tasks[idx] = task
-                this.tasks = tasks
-                if (this.updateStatusTimeout) {
-                    clearTimeout(this.updateStatusTimeout)
-                }
-                this.updateStatus(taskId)
+                const task = this.$store.getters.taskById(taskId)
+                let runner = new Runner()
+                runner.steps = task.steps
+                runner.run()
+                this.$set(this.runners, taskId, runner)
             },
-            updateStatus(taskId) {
-                this.tasks = this.tasks.concat()
-                this.updateStatusTimeout = setTimeout(() => {
-                    this.updateStatus(taskId)
-                }, 300)
-            }
         },
-        mounted() {
-            // M.FormSelect.init(this.$refs.select)
-        },
-        destroyed() {
-            if (this.updateStatusTimeout) {
-                clearTimeout(this.updateStatusTimeout)
-            }
-        }
     }
 </script>
 
@@ -132,27 +96,7 @@
         overflow: hidden;
     }
 
-    .run {
-        padding: 0 7px;
-    }
-
     .title {
         padding-left: 5px;
-    }
-
-    .loader {
-        border: 5px solid #f3f3f3; /* Light grey */
-        border-top: 5px solid #3498db; /* Blue */
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        animation: spin 2s linear infinite;
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
     }
 </style>

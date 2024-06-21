@@ -3,75 +3,105 @@
         <h1 v-if="isNew">New Task</h1>
         <h1 v-else>Edit Task</h1>
 
-        <form @submit.prevent="submitHandler">
-            <div class="row" v-if="error">
-                <Alert :type="'warning'" :message="'Warning'" :info="error"/>
+        <form class="ui form" ref="form">
+            <div class="field">
+                <label>Title</label>
+                <input v-model="title" type="text" class="validate" name="title">
             </div>
 
-            <div class="input-field">
-                <input id="title" v-model="title" type="text" class="validate" required>
-                <label for="title">Title</label>
-                <span class="helper-text" data-error="Title is required"></span>
-            </div>
-
-            <ul v-if="steps.length" class="collapsible" ref="collapsible">
+            <draggable v-if="steps.length" class="ui styled accordion"
+                :list="steps"
+                v-bind="dragOptions"
+                :component-data="getAccordionData()"
+            >
                 <Step
-                    v-for="(step, idx) in steps"
-                    :key="idx"
+                    v-for="(step) in steps"
+                    :key="step.order"
                     :initial-step="step"
                     @update="sync"
                     @delete="deleteStep"
                 />
-            </ul>
+            </draggable>
             <p v-else>
                 No actions
             </p>
 
-            <a class="btn" @click="addStep">
+            <a @click.stop="addStep" class="ui button">
+                <i class="add icon"></i>
                 Add Action
             </a>
-
+            <div v-if="stepsError" class="field error">
+                <div class="ui red pointing prompt label">Add at least one action</div>
+            </div>
             <hr>
-            <button class="btn" type="submit">
+            <div class="ui submit button">
                 <span v-if="isNew">Create</span>
                 <span v-else>Update</span>
-            </button>
+            </div>
         </form>
     </div>
 </template>
 
 <script>
-    import M from 'materialize-css'
     import Step from './Step.vue'
-    import Alert from '../Alert.vue'
+    import draggable from 'vuedraggable'
 
     export default {
         name: 'task',
         computed: {
             task() {
                 return this.$store.getters.taskById(+this.$route.params.id) || {steps: []}
+            },
+            dragOptions() {
+                return {
+                    ghostClass: 'ghost'
+                }
             }
         },
-        components: {Step, Alert},
+        components: {Step, draggable},
         data: () => ({
             isNew: true,
-            error: '',
             title: '',
             steps: [],
+            stepsError: false,
         }),
         mounted() {
             this.title = this.task.title
-            this.steps = this.task.steps
+            let steps = JSON.parse(JSON.stringify(this.task.steps))
+            steps.forEach(function (element, index) {
+                element.order = index + 1
+            })
+
+            this.steps = steps
             this.isNew = !this.task.id
 
             this.$nextTick(function () {
-                this.initCollapsible()
-                M.updateTextFields()
+                $('[ref=accordion]').accordion()
+                $(this.$refs.form)
+                    .form({
+                        fields: {
+                            title: {
+                                rules: [
+                                    {
+                                        type: 'empty',
+                                        prompt: 'Enter a title',
+                                    }
+                                ]
+                            },
+                        },
+                        inline: true,
+                        on: 'submit',
+                        onSuccess: this.submitHandler,
+                    })
             })
         },
         methods: {
-            initCollapsible() {
-                this.collapsible = M.Collapsible.init(this.$refs.collapsible, {})
+            getAccordionData() {
+                return {
+                    attrs: {
+                        ref: 'accordion'
+                    },
+                }
             },
             sync: function(stepData) {
                 let index = this.steps.findIndex((step) => step.id === stepData.id)
@@ -85,14 +115,12 @@
                     }
                 }
                 let steps = this.steps.concat()
-                steps.push({id: this.steps.length + 1})
+                steps.push({id: this.steps.length + 1, order: this.steps.length + 1})
                 this.steps = steps
+                this.stepsError = false
 
                 this.$nextTick(function () {
-                    if (this.steps.length === 1) {
-                        this.initCollapsible()
-                    }
-                    this.collapsible.open(this.steps.length - 1)
+                    $('[ref=accordion]').accordion('refresh').accordion('open', this.steps.length - 1)
                 })
             },
             deleteStep: function(stepId) {
@@ -101,9 +129,11 @@
                 steps.splice(index, 1)
                 this.steps = steps
             },
-            submitHandler() {
+            submitHandler(event) {
+                event.preventDefault()
+
                 if (!this.steps.length) {
-                    this.error = 'add at least one action.'
+                    this.stepsError = true
                     return
                 }
                 const task = {
@@ -116,15 +146,24 @@
                 this.$router.push('/list')
             }
         },
-        destroyed() {
-            if (this.collapsible && this.collapsible.destroy) {
-                this.collapsible.destroy()
-            }
-        }
     }
 </script>
-<style scoped>
-    #steps {
-        overflow: visible;
+<style lang="scss" scoped>
+    .accordion {
+        margin-bottom: 10px;
+
+        > div {
+            background: white;
+        }
     }
+
+    .button {
+        margin-top: 35px;
+    }
+
+    .ghost {
+        opacity: 0.5;
+        background: #c8ebfb !important;
+    }
+
 </style>
