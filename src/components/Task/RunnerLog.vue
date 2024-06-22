@@ -8,12 +8,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div v-for="item in log.log" class="card mb-3">
+                        <div v-for="item in log" class="card mb-3">
                             <div class="card-body">
                                 {{ item.message }}
                             </div>
                             <div class="card-img">
-                                <img v-if="item.screenshot" class="img-fluid" :src="`data:image/png;base64,${item.screenshot}`">
+                                <img v-if="item.screenshot" class="img-fluid" :src="item.screenshot">
                             </div>
                         </div>
                     </div>
@@ -26,8 +26,8 @@
     </div>
 </template>
 
-
 <script>
+import * as bootstrap from 'bootstrap'
     export default {
         name: 'runner_log',
         props: ['log'],
@@ -38,12 +38,12 @@
         },
         methods: {
             show() {
-                $(`#modal${this.modalRef}`).modal('show')
+                const myModal = new bootstrap.Modal(`#modal${this.modalRef}`)
+                myModal.show()
             },
         },
     }
 </script>
 
 <style lang="scss" scoped>
-    
 </style>

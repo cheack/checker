@@ -3,11 +3,11 @@
         <h1 v-if="isNew">New Task</h1>
         <h1 v-else>Edit Task</h1>
 
-        <form class="needs-validation" ref="form" novalidate>
+        <div class="needs-validation">
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input v-model="title" type="text" class="form-control" id="title" name="title" required>
-                <div class="invalid-feedback">
+                <div v-if="errors.title" class="invalid-feedback d-block">
                     Title is required.
                 </div>
             </div>
@@ -41,11 +41,11 @@
                 <div class="alert alert-danger">Add at least one action</div>
             </div>
             <hr>
-            <button type="submit" class="btn btn-success">
+            <a @click="submitHandler" class="btn btn-success">
                 <span v-if="isNew">Create</span>
                 <span v-else>Update</span>
-            </button>
-        </form>
+            </a>
+        </div>
     </div>
 </template>
 
@@ -74,6 +74,7 @@
             title: '',
             steps: [],
             stepsError: false,
+            errors: {},
         }),
         mounted() {
             this.title = this.task.title
@@ -84,35 +85,8 @@
 
             this.steps = steps
             this.isNew = !this.task.id
-
-            this.$nextTick(function () {
-                // $('[ref=accordion]').accordion()
-                // $(this.$refs.form)
-                //     .form({
-                //         fields: {
-                //             title: {
-                //                 rules: [
-                //                     {
-                //                         type: 'empty',
-                //                         prompt: 'Enter a title',
-                //                     }
-                //                 ]
-                //             },
-                //         },
-                //         inline: true,
-                //         on: 'submit',
-                //         onSuccess: this.submitHandler,
-                //     })
-            })
         },
         methods: {
-            getAccordionData() {
-                return {
-                    attrs: {
-                        ref: 'accordion'
-                    },
-                }
-            },
             sync: function(stepData) {
                 let index = this.steps.findIndex((step) => step.id === stepData.id)
                 this.steps[index] = stepData
@@ -139,9 +113,11 @@
                 steps.splice(index, 1)
                 this.steps = steps
             },
-            submitHandler(event) {
-                event.preventDefault()
-
+            submitHandler() {
+                if (!this.title.trim()) {
+                    this.errors.title = true
+                    return
+                }
                 if (!this.steps.length) {
                     this.stepsError = true
                     return

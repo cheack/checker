@@ -1,19 +1,18 @@
-// import Store from 'electron-store';
-// const store = new Store()
+function updateStorage(tasks) {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
 
 const state = {
     tasks: JSON.parse(localStorage.getItem('tasks') || '[]')
-    // tasks: store.get('tasks')
 }
 
 const mutations = {
-    setTaskLog(state, log) {
-        const tasks = state.tasks.concat()
-        const idx = tasks.findIndex(t => t.id === log.task_id)
-        tasks[idx].lastLog = log
-
-        state.tasks = tasks
-        store.set('tasks', state.tasks)
+    saveTaskLog(state, { taskId, log }) {
+        const task = state.tasks.find(t => t.id === taskId);
+        if (task) {
+            task.lastLog = log;
+            updateStorage(state.tasks);
+        }
     },
 
     storeTask(state, task) {
@@ -21,32 +20,25 @@ const mutations = {
             task.id = Date.now()
             state.tasks.push(task)
         } else {
-            const tasks = state.tasks.concat()
-
-            const idx = tasks.findIndex(t => t.id === task.id)
-            tasks[idx] = task
-
-            state.tasks = tasks
+            const index = state.tasks.findIndex(t => t.id === task.id)
+            if (index !== -1) {
+                state.tasks.splice(index, 1, task)
+            } else {
+                state.tasks.push(task)
+            }
         }
-
-        localStorage.setItem('tasks', JSON.stringify(state.tasks))
-
-        // console.log(store.get('tasks'))
-        // store.set('tasks', state.tasks)
+        updateStorage(state.tasks);
     },
-    deleteTask(state, taskId) {
-        const tasks = state.tasks.concat()
 
-        const idx = tasks.findIndex(t => t.id === taskId)
-        tasks.splice(idx, 1)
-        state.tasks = tasks
-        store.set('tasks', state.tasks)
+    deleteTask(state, taskId) {
+        state.tasks = state.tasks.filter(t => t.id !== taskId);
+        updateStorage(state.tasks);
     },
 }
 
 const actions = {
-    setTaskLog({commit}, log) {
-        commit('setTaskLog', log)
+    saveTaskLog({commit}, log) {
+        commit('saveTaskLog', log)
     },
     storeTask({commit}, task) {
         commit('storeTask', task)
