@@ -37,7 +37,6 @@
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.0.0",
     "sass": "^1.77.6",
-    "selenium-webdriver": "^4.22.0",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",
     "vuedraggable": "^2.24.3",
