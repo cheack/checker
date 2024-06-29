@@ -1,6 +1,7 @@
 import Click from './Click';
 import LoadUrl from './LoadUrl';
 import Type from './Type';
+import WaitForElement from './WaitForElement';
 
 export default class ActionFactory {
     static get(action, webdriver) {
@@ -13,6 +14,9 @@ export default class ActionFactory {
 
             case 'click':
                 return new Click(action, webdriver);
+
+            case 'wait_for_element':
+                return new WaitForElement(action, webdriver);
         }
     }
 }

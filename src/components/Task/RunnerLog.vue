@@ -33,6 +33,7 @@ import * as bootstrap from 'bootstrap'
         props: ['log'],
         data() {
             return {
+                ///modalRef: Math.random().toString(36).slice(2)
                 modalRef: Math.random().toString(36).slice(2)
             }
         },

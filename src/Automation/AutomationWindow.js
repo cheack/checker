@@ -9,6 +9,7 @@ export default class AutomationWindow {
         ipcMain.on('automation-window-find-element', this.findElement.bind(this));
         ipcMain.on('automation-window-type-text', this.typeText.bind(this));
         ipcMain.on('automation-window-click-element', this.clickElement.bind(this));
+        ipcMain.on("automation-window-wait-for-element", this.waitForElement.bind(this));
     }
 
     successAction(message = null) {
@@ -20,14 +21,13 @@ export default class AutomationWindow {
     }
 
     async createAutomationWindow() {
-
         this.window = new BrowserWindow({
             // width: 500,
             // height: 500,
             show: false,
             webPreferences: {
-                offscreen: true
-            }
+                offscreen: true,
+            },
         });
         this.window.webContents.openDevTools();
 
@@ -38,21 +38,20 @@ export default class AutomationWindow {
         this.window.loadURL('https://' + url).then(() => {
             this.successAction('automation-window-url-loaded!');
         });
-
     }
 
     async takeScreenshot() {
-        let image = await this.window.webContents.capturePage()
+        let image = await this.window.webContents.capturePage();
         this.successAction(image.toDataURL());
     }
 
     async findElement(event, selector) {
-        const elementExists = await this.checkElementExists(selector);
+        const elementExists = await this.waitForElementOnPage(selector);
         this.successAction(elementExists);
     }
 
     async typeText(event, { selector, text }) {
-        const elementExists = await this.checkElementExists(selector);
+        const elementExists = await this.waitForElementOnPage(selector);
 
         if (elementExists) {
             await this.window.webContents.executeJavaScript(`document.querySelector("${selector}").value = "${text}"`);
@@ -63,30 +62,63 @@ export default class AutomationWindow {
     }
 
     async clickElement(event, selector) {
-        const elementExists = await this.checkElementExists(selector);
+        const elementExists = await this.waitForElementOnPage(selector);
 
         if (elementExists) {
             await this.window.webContents.executeJavaScript(`document.querySelector("${selector}").click()`);
-            this.successAction('automation-window-element-clicked');
+            this.successAction("automation-window-element-clicked");
         } else {
-            this.errorAction('error: element not found or cannot click')
+            this.errorAction("error: element not found or cannot click");
         }
     }
 
-    async checkElementExists(selector) {
-        return await this.window.webContents.executeJavaScript(`
-            new Promise((resolve) => {
-                const interval = setInterval(() => {
+    async waitForElement(event, selector) {
+        const elementExists = await this.waitForElementOnPage(selector);
+
+        if (elementExists) {
+            this.successAction("automation-window-wait-for-element-success");
+        } else {
+            this.errorAction("error: element not found.");
+        }
+    }
+
+    // Function to check if element exists, including after redirects
+    async waitForElementOnPage(selector) {
+        const checkElementInPage = async (selector) => {
+            return await this.window.webContents.executeJavaScript(`
+                new Promise((resolve) => {
                     if (document.querySelector("${selector}")) {
-                        clearInterval(interval);
                         resolve(true);
+                    } else {
+                        resolve(false);
                     }
-                }, 100);
-                setTimeout(() => {
-                    clearInterval(interval);
-                    resolve(false);
-                }, 10000);
-            });
-        `);
+                });
+            `);
+        };
+
+        let elementFound = false;
+        let elapsedTime = 0;
+
+        const periodicCheck = async (resolve, reject) => {
+            elementFound = await checkElementInPage(selector);
+            elapsedTime += 500;
+            if (elementFound || elapsedTime >= 10000) {
+                clearTimeout(timeout);
+                resolve(elementFound);
+            } else {
+                setTimeout(periodicCheck, 500, resolve, reject);
+            }
+        };
+
+        const timeout = setTimeout(() => {
+            periodicCheck(
+                (result) => {},
+                (error) => {}
+            );
+        }, 500);
+
+        return new Promise((resolve, reject) => {
+            periodicCheck(resolve, reject);
+        });
     }
 }
