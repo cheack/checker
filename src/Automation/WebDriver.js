@@ -53,7 +53,7 @@ export default class WebDriver {
         return await this.sendIpcMessage("automation-window-take-screenshot");
     }
 
-    async waitForElement() {
-        return await this.sendIpcMessage("automation-window-wait-for-element");
+    async waitForElement(selector) {
+        return await this.sendIpcMessage("automation-window-wait-for-element", selector);
     }
 }

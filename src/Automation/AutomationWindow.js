@@ -42,7 +42,15 @@ export default class AutomationWindow {
     #registerGlobalFunctions() {
         this.window.webContents.executeJavaScript(`
             window.getElement = (selectorOrXpath) => {
-                return document.querySelector(selectorOrXpath) || document.evaluate(selectorOrXpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                try {
+                    return document.querySelector(selectorOrXpath);
+                } catch (e) {
+                    try {
+                        return document.evaluate(selectorOrXpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                    } catch (e) {
+                        return null;
+                    }
+                }
             };
         `);
     }
@@ -70,7 +78,7 @@ export default class AutomationWindow {
             await this.window.webContents.executeJavaScript(`window.getElement("${selector}").value = "${text}"`);
             this.successAction('automation-window-text-typed');
         } else {
-            this.errorAction('error: element not found')
+            this.errorAction(`error: element ${selector} not found`);
         }
     }
 
@@ -91,7 +99,7 @@ export default class AutomationWindow {
         if (elementExists) {
             this.successAction("automation-window-wait-for-element-success");
         } else {
-            this.errorAction("error: element not found.");
+            this.errorAction(`error: element ${selector} not found`);
         }
     }
 
@@ -114,12 +122,12 @@ export default class AutomationWindow {
 
         const periodicCheck = async (resolve, reject) => {
             elementFound = await checkElementInPage(selector);
-            elapsedTime += 500;
+            elapsedTime += 250;
             if (elementFound || elapsedTime >= 10000) {
                 clearTimeout(timeout);
                 resolve(elementFound);
             } else {
-                setTimeout(periodicCheck, 500, resolve, reject);
+                setTimeout(periodicCheck, 250, resolve, reject);
             }
         };
 
@@ -128,7 +136,7 @@ export default class AutomationWindow {
                 (result) => {},
                 (error) => {}
             );
-        }, 500);
+        }, 250);
 
         return new Promise((resolve, reject) => {
             periodicCheck(resolve, reject);
