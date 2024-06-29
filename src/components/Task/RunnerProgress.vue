@@ -23,17 +23,7 @@ import RunnerLog from './RunnerLog.vue';
 export default {
     name: 'runner_progress',
     components: { RunnerLog },
-    props: ['taskId', 'runner', 'lastLog'],
-    computed: {
-        log() {
-            return {
-                task_id: this.taskId,
-                log: this.runner.log,
-                result: this.runner.result,
-                error: this.runner.error,
-            };
-        }
-    },
+    props: ['runner'],
     methods: {
         showLog() {
             this.$refs.log.show();

@@ -21,11 +21,7 @@
 
                     <span class="title">{{ task.title }}</span>
 
-                    <RunnerProgress v-if="runners[task.id]"
-                                    :runner="runners[task.id]"
-                                    :task-id="task.id"
-                                    :last-log="task.lastLog"
-                                    @update="saveLog" />
+                    <RunnerProgress v-if="runners[task.id]" :runner="runners[task.id]"/>
                 </td>
                 <td style="width: 20%">
                     <router-link tag="button" class="btn btn-secondary" :to="'/task/' + task.id">
@@ -59,9 +55,6 @@ import { watch } from 'vue';
             }
         },
         methods: {
-            saveLog(log) {
-                // this.$store.dispatch('setTaskLog', log)
-            },
             showLog(ref) {
                 this.$refs[ref][0].show()
             },
@@ -83,8 +76,6 @@ import { watch } from 'vue';
 
                 // Наблюдаем за изменениями логов и сохраняем в сторе
                 watch(() => runner.log, (newLogs) => {
-                    // this.saveLog(taskId, newLogs);
-                    console.log('newlogs - ' + JSON.stringify(newLogs.value))
                     this.$store.dispatch('saveTaskLog', { taskId, log: newLogs });
                 }, { deep: true });
             },
