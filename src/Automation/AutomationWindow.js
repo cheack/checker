@@ -29,9 +29,22 @@ export default class AutomationWindow {
                 offscreen: true,
             },
         });
-        this.window.webContents.openDevTools();
 
-        this.successAction('automation-window-created!');
+        this.#registerGlobalFunctions();
+
+        this.window.webContents.on("did-navigate", () => {
+            this.#registerGlobalFunctions();
+        });
+
+        this.successAction("automation-window-created!");
+    }
+
+    #registerGlobalFunctions() {
+        this.window.webContents.executeJavaScript(`
+            window.getElement = (selectorOrXpath) => {
+                return document.querySelector(selectorOrXpath) || document.evaluate(selectorOrXpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+            };
+        `);
     }
 
     async loadURL(sender, url) {
@@ -54,7 +67,7 @@ export default class AutomationWindow {
         const elementExists = await this.waitForElementOnPage(selector);
 
         if (elementExists) {
-            await this.window.webContents.executeJavaScript(`document.querySelector("${selector}").value = "${text}"`);
+            await this.window.webContents.executeJavaScript(`window.getElement("${selector}").value = "${text}"`);
             this.successAction('automation-window-text-typed');
         } else {
             this.errorAction('error: element not found')
@@ -65,7 +78,7 @@ export default class AutomationWindow {
         const elementExists = await this.waitForElementOnPage(selector);
 
         if (elementExists) {
-            await this.window.webContents.executeJavaScript(`document.querySelector("${selector}").click()`);
+            await this.window.webContents.executeJavaScript(`window.getElement("${selector}").click()`);
             this.successAction("automation-window-element-clicked");
         } else {
             this.errorAction("error: element not found or cannot click");
@@ -87,7 +100,7 @@ export default class AutomationWindow {
         const checkElementInPage = async (selector) => {
             return await this.window.webContents.executeJavaScript(`
                 new Promise((resolve) => {
-                    if (document.querySelector("${selector}")) {
+                    if (window.getElement("${selector}")) {
                         resolve(true);
                     } else {
                         resolve(false);

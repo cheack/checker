@@ -1,5 +1,5 @@
 export default class WebDriver {
-    constructor(mainWindow) {
+    constructor() {
         this.initIpcListeners();
     }
 

@@ -41,26 +41,11 @@ export default class Runner {
                 let element
                 let action = this.actions[i]
 
-                // if (action.element) {
-                //     if (action.xpath) {
-                //         element = webdriver.By.xpath(action.element)
-                //     } else {
-                //         element = webdriver.By.css(action.element)
-                //     }
-                // }
-
-                const actionClass = ActionFactory.get(action, webdriver)
-                this.setMessage(actionClass.message)
-                await actionClass.run()
+                const actionClass = ActionFactory.get(action, webdriver);
+                this.setMessage(actionClass.message);
+                await actionClass.run();
 
 
-                // case 'wait_for_element':
-                //     this.message = action.log || `Waiting for element "${action.element}"...`
-                //     await browser.wait(webdriver.until.elementLocated(element), 15 * 1000)
-                //     break
-                //
-
-                    
                 //
                 // case 'get_text':
                 //     this.message = action.log || `Getting text from "${action.element}"...`

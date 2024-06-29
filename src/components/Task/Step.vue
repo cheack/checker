@@ -30,14 +30,8 @@
 
                 <div v-if="['type', 'click', 'wait_for_element', 'get_text'].includes(action)" class="row mb-3">
                     <div class="col-8">
-                        <label for="element" class="form-label">Element</label>
+                        <label for="element" class="form-label">Element (selector or xpath)</label>
                         <input type="text" v-model="element" class="form-control" id="element">
-                    </div>
-                    <div class="col-4 d-flex align-items-center">
-                        <div class="form-check">
-                            <input type="checkbox" v-model="xpath" class="form-check-input" :id="`xpath${id}`"/>
-                            <label class="form-check-label" :for="`xpath${id}`">xpath</label>
-                        </div>
                     </div>
                 </div>
 
@@ -70,7 +64,6 @@
                 element: this.initialStep.element,
                 text: this.initialStep.text || '',
                 url: this.initialStep.url || '',
-                xpath: this.initialStep.xpath || false,
                 log: this.initialStep.log || '',
                 order: this.initialStep.order || 1,
             }
@@ -83,7 +76,6 @@
                     element: this.element,
                     text: this.text,
                     url: this.url,
-                    xpath: this.xpath,
                     log: this.log,
                     order: this.order,
                 }
