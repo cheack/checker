@@ -8,9 +8,9 @@
             {{ runner.result }}
         </p>
 
-        <p v-if="runner.error">
+        <div v-if="runner.error" class="alert alert-danger">
             {{ runner.error }}
-        </p>
+        </div>
 
         <a @click="showLog">View Log</a>
         <RunnerLog :log="runner.log" ref="log" />
