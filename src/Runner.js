@@ -1,4 +1,5 @@
-import WebDriver from "./WebDriver";
+import ActionFactory from './Automation/Actions/ActionFactory';
+import WebDriver from "./Automation/WebDriver";
 import { ref } from "vue";
 
 export default class Runner {
@@ -48,29 +49,18 @@ export default class Runner {
                 //     }
                 // }
 
-                switch (action.action) {
-                    case 'load_site':
-                        this.setMessage(`Loading "${action.url}"...`)
-                        console.log(this.message)
-                        await webdriver.loadURL(action.url)
-                        break
+                const actionClass = ActionFactory.get(action, webdriver)
+                this.setMessage(actionClass.message)
+                await actionClass.run()
+
 
                 // case 'wait_for_element':
                 //     this.message = action.log || `Waiting for element "${action.element}"...`
                 //     await browser.wait(webdriver.until.elementLocated(element), 15 * 1000)
                 //     break
                 //
-                // case 'type':
-                //     this.message = `Typing "${action.text}" to "${action.element}"...`
-                //     let input = await browser.findElement(element)
-                //     input.sendKeys(action.text)
-                //     break
-                //
-                // case 'click':
-                //     this.message = action.log || `Clicking on "${action.element}"...`
-                //     element = await browser.findElement(element)
-                //     await element.click()
-                //     break
+
+                    
                 //
                 // case 'get_text':
                 //     this.message = action.log || `Getting text from "${action.element}"...`
@@ -85,24 +75,25 @@ export default class Runner {
                 //         values: values,
                 //     })
                 //     break
-                }
+                // }
 
                 this.addLog(
                     this.message.value,
                     await webdriver.takeScreenshot(),
                 )
-
-                console.log(this.log)
             }
 
             this.setMessage('Done.')
             this.addLog(this.message.value)
             this.done.value = true
         } catch (e) {
-            this.error.value = `Error: ${e.message}`
-            console.log(e)
+            this.error.value = `Error: ${e}`
+
             try {
-                // await this.screenshot(browser)
+                this.addLog(
+                    this.message.value,
+                    await webdriver.takeScreenshot(),
+                )
             } finally {
             }
         } finally {
