@@ -1,11 +1,11 @@
 <template>
-    <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="`#collapse${id}`" aria-controls="collapseOne">
+    <h2 class="accordion-header position-relative">
+        <button class="accordion-button collapsed z-1" type="button" data-bs-toggle="collapse" :data-bs-target="`#collapse${id}`" aria-controls="collapseOne">
             <div class="step-title" v-html="getStepHeader()"></div>
-            <div class="indicators">
-                <i @click.stop="remove" class="bi bi-trash text-danger" title="Delete"></i>
-            </div>
         </button>
+         <div class="indicators position-absolute z-2 h-100 d-flex align-items-center">
+            <i @click="remove" class="delete-step bi bi-trash text-danger" title="Delete"></i>
+        </div>
     </h2>
 
     <div :id="`collapse${id}`" class="accordion-collapse collapse"  data-bs-parent="#accordionExample">
@@ -133,7 +133,21 @@
             font-weight: bold;
         }
     }
+    .accordion-header {
+        &:hover {
+            .indicators {
+                visibility: visible;
+            }
+        }
+    }
     .indicators {
-        float: right;
+        cursor: pointer;
+        visibility: hidden;
+        top: 0;
+        right: 50px;
+
+        .delete-step {
+            font-size: 20px;
+        }
     }
 </style>
