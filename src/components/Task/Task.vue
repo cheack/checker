@@ -48,6 +48,7 @@
 <script>
 import Step from './Step.vue'
 import { VueDraggableNext } from 'vue-draggable-next'
+import * as bootstrap from 'bootstrap'
 
 export default {
     name: 'task',
@@ -86,16 +87,22 @@ export default {
             if (this.steps.length) {
                 let lastStep = this.steps[this.steps.length - 1]
                 if (lastStep && !lastStep.action) {
+                    let lastStepElement = document.getElementById(`collapse${lastStep.id}`);
+                    let lastStepCollapse = new bootstrap.Collapse(lastStepElement, {toggle:false});
+                    lastStepCollapse.show();
                     return
                 }
             }
             let steps = this.steps.concat()
-            steps.push({id: this.steps.length + 1, order: this.steps.length + 1})
+            const newId = this.steps.length + 1
+            steps.push({id: newId, order: newId})
             this.steps = steps
             this.stepsError = false
 
             this.$nextTick(function () {
-                // $('[ref=accordion]').accordion('refresh').accordion('open', this.steps.length - 1)
+                let newStepElement = document.getElementById(`collapse${newId}`);
+                let newStepCollapse = new bootstrap.Collapse(newStepElement);
+                newStepCollapse.show();
             })
         },
         deleteStep: function(stepId) {
