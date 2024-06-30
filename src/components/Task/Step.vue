@@ -1,49 +1,47 @@
 <template>
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="`#collapse${id}`" aria-controls="collapseOne">
-                <div class="step-title" v-html="getStepHeader()"></div>
-                <div class="indicators">
-                    <i @click.stop="remove" class="bi bi-trash text-danger" title="Delete"></i>
-                </div>
-            </button>
-        </h2>
+    <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="`#collapse${id}`" aria-controls="collapseOne">
+            <div class="step-title" v-html="getStepHeader()"></div>
+            <div class="indicators">
+                <i @click.stop="remove" class="bi bi-trash text-danger" title="Delete"></i>
+            </div>
+        </button>
+    </h2>
 
-        <div :id="`collapse${id}`" class="accordion-collapse collapse"  data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <div class="mb-3">
-                    <label for="action" class="form-label">Action</label>
-                    <select ref="action" v-model="action" class="form-select" id="action">
-                        <option value="">Choose your action</option>
-                        <option value="load_site">Load Site</option>
-                        <option value="type">Type text</option>
-                        <option value="click">Click on element</option>
-                        <option value="wait_for_element">Wait for element</option>
-                        <option value="get_text">Get element text</option>
-                    </select>
-                </div>
+    <div :id="`collapse${id}`" class="accordion-collapse collapse"  data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <div class="mb-3">
+                <label for="action" class="form-label">Action</label>
+                <select ref="action" v-model="action" class="form-select" id="action">
+                    <option value="">Choose your action</option>
+                    <option value="load_site">Load Site</option>
+                    <option value="type">Type text</option>
+                    <option value="click">Click on element</option>
+                    <option value="wait_for_element">Wait for element</option>
+                    <option value="get_text">Get element text</option>
+                </select>
+            </div>
 
-                <div v-if="action === 'load_site'" class="mb-3">
-                    <label for="url" class="form-label">URL</label>
-                    <input type="text" v-model="url" class="form-control" id="url">
-                </div>
+            <div v-if="action === 'load_site'" class="mb-3">
+                <label for="url" class="form-label">URL</label>
+                <input type="text" v-model="url" class="form-control" id="url">
+            </div>
 
-                <div v-if="['type', 'click', 'wait_for_element', 'get_text'].includes(action)" class="row mb-3">
-                    <div class="col-8">
-                        <label for="element" class="form-label">Element (selector or xpath)</label>
-                        <input type="text" v-model="element" class="form-control" id="element">
-                    </div>
+            <div v-if="['type', 'click', 'wait_for_element', 'get_text'].includes(action)" class="row mb-3">
+                <div class="col-8">
+                    <label for="element" class="form-label">Element (selector or xpath)</label>
+                    <input type="text" v-model="element" class="form-control" id="element">
                 </div>
+            </div>
 
-                <div v-if="action === 'type'" class="mb-3">
-                    <label for="text" class="form-label">Text to type</label>
-                    <input type="text" v-model="text" class="form-control" id="text">
-                </div>
+            <div v-if="action === 'type'" class="mb-3">
+                <label for="text" class="form-label">Text to type</label>
+                <input type="text" v-model="text" class="form-control" id="text">
+            </div>
 
-                <div class="mb-3">
-                    <label for="log" class="form-label">Custom log text</label>
-                    <input type="text" v-model="log" class="form-control" id="log">
-                </div>
+            <div class="mb-3">
+                <label for="log" class="form-label">Custom log text</label>
+                <input type="text" v-model="log" class="form-control" id="log">
             </div>
         </div>
     </div>
@@ -85,6 +83,10 @@
             compoundProperty: function (val) {
                 this.$emit('update', val)
             },
+        },
+        emits: {
+            update: null,
+            delete: null,
         },
         methods: {
             getStepHeader() {

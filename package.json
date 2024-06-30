@@ -39,6 +39,7 @@
     "electron-store": "^10.0.0",
     "sass": "^1.77.6",
     "vue": "^3.4.29",
+    "vue-draggable-next": "^2.2.1",
     "vue-router": "^4.3.3",
     "vuedraggable": "^2.24.3",
     "vuex": "^4.1.0"
