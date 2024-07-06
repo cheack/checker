@@ -121,13 +121,11 @@
     }
 </script>
 
-<style lang="scss" >
-    .title * {
-        color: rgba(0,0,0,.95);
-    }
+<style lang="scss">
     .step-title {
-        display: inline;
-        font-weight: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 25px;
 
         span {
             font-weight: bold;
