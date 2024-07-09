@@ -56,7 +56,11 @@ export default class AutomationWindow {
     }
 
     async loadURL(sender, url) {
-        this.window.loadURL('https://' + url).then(() => {
+        if (!/^https?:\/\//.test(url)) {
+            url = "https://" + url;
+        }
+
+        this.window.loadURL(url).then(() => {
             this.successAction('automation-window-url-loaded!');
         });
     }
