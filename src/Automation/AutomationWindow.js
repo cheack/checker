@@ -108,7 +108,7 @@ export default class AutomationWindow {
         const checkElementInPage = async (selector) => {
             return await this.window.webContents.executeJavaScript(`
                 new Promise((resolve) => {
-                    if (window.getElement("${selector}")) {
+                    if (typeof window.getElement === "function" && window.getElement("${selector}")) {
                         resolve(true);
                     } else {
                         resolve(false);
