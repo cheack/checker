@@ -1,5 +1,5 @@
 <template>
-    <h2 class="accordion-header position-relative">
+    <h2 class="accordion-header position-relative drag-handle">
         <button class="accordion-button collapsed z-1" type="button" data-bs-toggle="collapse" :data-bs-target="`#collapse${id}`" aria-controls="collapseOne">
             <div class="step-title" v-html="getStepHeader()"></div>
         </button>

@@ -14,7 +14,7 @@
 
 
             <div v-if="steps.length" class="accordion">
-                 <draggable class="dragArea" :list="steps" >
+                 <draggable class="dragArea" :list="steps" handle=".drag-handle">
                     <div class="accordion-item" v-for="step in steps" :key="step.order">
                         <Step
                             :initial-step="step"
