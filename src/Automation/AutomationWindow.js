@@ -2,22 +2,25 @@ const { BrowserWindow, ipcMain } = require('electron');
 
 export default class AutomationWindow {
     constructor(mainWindow) {
-        this.mainWindow = mainWindow
-        ipcMain.on('automation-window-create', this.createAutomationWindow.bind(this));
-        ipcMain.on('automation-window-load-url', this.loadURL.bind(this));
-        ipcMain.on('automation-window-take-screenshot', this.takeScreenshot.bind(this));
-        ipcMain.on('automation-window-find-element', this.findElement.bind(this));
-        ipcMain.on('automation-window-type-text', this.typeText.bind(this));
-        ipcMain.on('automation-window-click-element', this.clickElement.bind(this));
-        ipcMain.on("automation-window-wait-for-element", this.waitForElement.bind(this));
+        this.mainWindow = mainWindow;
+        ipcMain.on("automation-window-create", this.#action(this.createAutomationWindow.bind(this)));
+        ipcMain.on("automation-window-load-url", this.#action(this.loadURL.bind(this)));
+        ipcMain.on("automation-window-take-screenshot", this.#action(this.takeScreenshot.bind(this)));
+        ipcMain.on("automation-window-find-element", this.#action(this.findElement.bind(this)));
+        ipcMain.on("automation-window-type-text", this.#action(this.typeText.bind(this)));
+        ipcMain.on("automation-window-click-element", this.#action(this.clickElement.bind(this)));
+        ipcMain.on("automation-window-wait-for-element", this.#action(this.waitForElement.bind(this)));
     }
 
     successAction(message = null) {
-        this.mainWindow.webContents.send('automation-window-success', message);
+        this.mainWindow.webContents.send("automation-window-success", message);
     }
 
     errorAction(message = null) {
-        this.mainWindow.webContents.send('automation-window-error', message);
+        this.mainWindow.webContents.send("automation-window-error", {
+            message: message,
+            consoleLog: this.consoleLog,
+        });
     }
 
     async createAutomationWindow() {
@@ -30,6 +33,12 @@ export default class AutomationWindow {
             },
         });
 
+        this.consoleLog = [];
+        const consoleMessageHandler = (event, level, message, line, sourceId) => {
+            this.consoleLog.push({ message, line, sourceId });
+        };
+        this.window.webContents.on("console-message", consoleMessageHandler);
+
         this.#registerGlobalFunctions();
 
         this.window.webContents.on("did-navigate", () => {
@@ -37,6 +46,16 @@ export default class AutomationWindow {
         });
 
         this.successAction("automation-window-created!");
+    }
+
+    #action(callback) {
+        return async (event, ...args) => {
+            try {
+                await callback(event, ...args);
+            } catch (error) {
+                this.errorAction(error.message);
+            }
+        };
     }
 
     #registerGlobalFunctions() {
@@ -61,7 +80,7 @@ export default class AutomationWindow {
         }
 
         this.window.loadURL(url).then(() => {
-            this.successAction('automation-window-url-loaded!');
+            this.successAction("automation-window-url-loaded!");
         });
     }
 
@@ -79,8 +98,17 @@ export default class AutomationWindow {
         const elementExists = await this.waitForElementOnPage(selector);
 
         if (elementExists) {
-            await this.window.webContents.executeJavaScript(`window.getElement("${selector}").value = "${text}"`);
-            this.successAction('automation-window-text-typed');
+            await this.window.webContents.executeJavaScript(`
+                var element = window.getElement("${selector}");
+                element.value = "${text}"
+                var event = new Event('input', {
+                    bubbles: true,
+                    cancelable: true,
+                });
+
+                element.dispatchEvent(event);
+            `);
+            this.successAction("automation-window-text-typed");
         } else {
             this.errorAction(`error: element ${selector} not found`);
         }

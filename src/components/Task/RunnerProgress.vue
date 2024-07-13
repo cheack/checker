@@ -8,7 +8,7 @@
             {{ runner.result }}
         </p>
 
-        <div v-if="runner.error" class="alert alert-danger">
+        <div v-if="runner.error" class="error alert alert-danger">
             {{ runner.error }}
         </div>
 
@@ -33,4 +33,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.error {
+    white-space: pre-line;
+}
 </style>
