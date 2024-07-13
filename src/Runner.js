@@ -72,7 +72,9 @@ export default class Runner {
             this.addLog(this.message.value)
             this.done.value = true
         } catch (e) {
-            this.error.value = `Error: ${e.message}\n\nConsole log:\n` + e.consoleLog.map((log) => `- ${log.message}`).join("\n");
+            this.error.value =
+                `Error on step "${this.message.value}":\n ${e.message}\n\nConsole log:\n` +
+                e.consoleLog.map((log) => `- ${log.message}`).join("\n");
 
             try {
                 this.addLog(
