@@ -39,6 +39,9 @@ export default class AutomationWindow {
         };
         this.window.webContents.on("console-message", consoleMessageHandler);
 
+        const session = this.window.webContents.session;
+        await session.clearStorageData();
+
         this.#registerGlobalFunctions();
 
         this.window.webContents.on("did-navigate", () => {
