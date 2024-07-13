@@ -140,38 +140,25 @@ export default class AutomationWindow {
 
     // Function to check if element exists, including after redirects
     async waitForElementOnPage(selector) {
-        const checkElementInPage = async (selector) => {
-            return await this.window.webContents.executeJavaScript(`
-                new Promise((resolve) => {
-                    if (typeof window.getElement === "function" && window.getElement("${selector}")) {
-                        resolve(true);
-                    } else {
-                        resolve(false);
-                    }
-                });
+        const checkElementInPage = (selector) => {
+            return this.window.webContents.executeJavaScript(`
+                (() => {
+                    return typeof window.getElement === "function" && window.getElement("${selector}") !== null
+                })()
             `);
         };
 
-        let elementFound = false;
         let elapsedTime = 0;
 
         const periodicCheck = async (resolve, reject) => {
-            elementFound = await checkElementInPage(selector);
-            elapsedTime += 250;
+            let elementFound = await checkElementInPage(selector);
+
             if (elementFound || elapsedTime >= 10000) {
-                clearTimeout(timeout);
-                resolve(elementFound);
+                resolve(true);
             } else {
                 setTimeout(periodicCheck, 250, resolve, reject);
             }
         };
-
-        const timeout = setTimeout(() => {
-            periodicCheck(
-                (result) => {},
-                (error) => {}
-            );
-        }, 250);
 
         return new Promise((resolve, reject) => {
             periodicCheck(resolve, reject);
