@@ -28,6 +28,7 @@
                         Edit
                     </router-link>
                     <button class="btn btn-danger" @click="remove(task.id)">Delete</button>
+                    <button class="btn btn-primary" @click="clone(task.id)">Clone</button>
                 </td>
             </tr>
             </tbody>
@@ -65,6 +66,9 @@ import { watch } from 'vue';
                 if (confirm('Are you sure?')) {
                     this.$store.dispatch('deleteTask', taskId)
                 }
+            },
+            clone(taskId) {
+                this.$store.dispatch('cloneTask', taskId)
             },
             run(taskId) {
                 const task = this.$store.getters.taskById(taskId)

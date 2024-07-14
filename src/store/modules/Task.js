@@ -7,8 +7,19 @@ const state = {
 }
 
 const mutations = {
+    cloneTask(state, taskId) {
+        const task = state.tasks.find((t) => t.id === taskId);
+        if (task) {
+            const clonedTask = JSON.parse(JSON.stringify(task));
+            clonedTask.id = Date.now();
+            clonedTask.title = task.title + " (copy)";
+            state.tasks.push(clonedTask);
+            updateStorage(state.tasks);
+        }
+    },
+
     saveTaskLog(state, { taskId, log }) {
-        const task = state.tasks.find(t => t.id === taskId);
+        const task = state.tasks.find((t) => t.id === taskId);
         if (task) {
             task.lastLog = log;
             updateStorage(state.tasks);
@@ -17,36 +28,39 @@ const mutations = {
 
     storeTask(state, task) {
         if (!task.id) {
-            task.id = Date.now()
-            state.tasks.push(task)
+            task.id = Date.now();
+            state.tasks.push(task);
         } else {
-            const index = state.tasks.findIndex(t => t.id === task.id)
+            const index = state.tasks.findIndex((t) => t.id === task.id);
             if (index !== -1) {
-                state.tasks.splice(index, 1, task)
+                state.tasks.splice(index, 1, task);
             } else {
-                state.tasks.push(task)
+                state.tasks.push(task);
             }
         }
         updateStorage(state.tasks);
     },
 
     deleteTask(state, taskId) {
-        state.tasks = state.tasks.filter(t => t.id !== taskId);
+        state.tasks = state.tasks.filter((t) => t.id !== taskId);
         updateStorage(state.tasks);
     },
-}
+};
 
 const actions = {
-    saveTaskLog({commit}, log) {
-        commit('saveTaskLog', log)
+    saveTaskLog({ commit }, log) {
+        commit("saveTaskLog", log);
     },
-    storeTask({commit}, task) {
-        commit('storeTask', task)
+    storeTask({ commit }, task) {
+        commit("storeTask", task);
     },
-    deleteTask({commit}, taskId) {
-        commit('deleteTask', taskId)
+    deleteTask({ commit }, taskId) {
+        commit("deleteTask", taskId);
     },
-}
+    cloneTask({ commit }, taskId) {
+        commit("cloneTask", taskId);
+    },
+};
 
 export const config = {
     state,
