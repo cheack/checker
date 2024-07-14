@@ -94,7 +94,7 @@ export default {
                 }
             }
             let steps = this.steps.concat()
-            const newId = this.steps.length + 1
+            const newId = this.steps[this.steps.length - 1].id + 1;
             steps.push({id: newId, order: newId})
             this.steps = steps
             this.stepsError = false
