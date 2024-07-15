@@ -41,6 +41,10 @@
                 <span v-if="isNew">Create</span>
                 <span v-else>Update</span>
             </a>
+
+            <router-link to="/" class="ms-2 btn">
+                Back
+            </router-link>
         </div>
     </div>
 </template>
