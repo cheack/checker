@@ -84,6 +84,9 @@ export default {
             this.steps[index] = stepData
         },
         addStep() {
+            let steps;
+            let newId;
+
             if (this.steps.length) {
                 let lastStep = this.steps[this.steps.length - 1]
                 if (lastStep && !lastStep.action) {
@@ -92,9 +95,14 @@ export default {
                     lastStepCollapse.show();
                     return
                 }
+
+                newId = this.steps[this.steps.length - 1].id + 1;
+                steps = this.steps.concat()
+            } else {
+                newId = 1;
+                steps = []
             }
-            let steps = this.steps.concat()
-            const newId = this.steps[this.steps.length - 1].id + 1;
+
             steps.push({id: newId, order: newId})
             this.steps = steps
             this.stepsError = false
@@ -112,7 +120,7 @@ export default {
             this.steps = steps
         },
         submitHandler() {
-            if (!this.title.trim()) {
+            if (!this.title?.trim()) {
                 this.errors.title = true
                 return
             }
