@@ -15,8 +15,12 @@
                         <RunnerLog :log="task.lastLog" :ref="`lastLog${task.id}`" />
                     </p>
 
-                    <button class="btn btn-primary" :class="{ 'spinner-border': isRunning(task.id) }" :disabled="isRunning(task.id)" @click="run(task.id)">
-                        <i class="bi bi-play"></i>
+                    <button class="btn btn-primary" @click="isRunning(task.id) ? stop(task.id) : run(task.id)">
+                        <span v-if="isRunning(task.id)">
+                            <span class="spinner-border spinner-border-sm"></span>
+                            <span class="bi bi-stop-fill"></span>
+                        </span>
+                        <span v-else class="bi bi-play"></span>
                     </button>
 
                     <span class="title">{{ task.title }}</span>
@@ -60,7 +64,7 @@ import { watch } from 'vue';
                 this.$refs[ref][0].show()
             },
             isRunning(taskId) {
-                return this.runners[taskId] && this.runners[taskId].running
+                return this.runners[taskId]?.running
             },
             remove(taskId) {
                 if (confirm('Are you sure?')) {
@@ -82,6 +86,9 @@ import { watch } from 'vue';
                 watch(() => runner.log, (newLogs) => {
                     this.$store.dispatch('saveTaskLog', { taskId, log: newLogs });
                 }, { deep: true });
+            },
+            stop(taskId) {
+                this.runners[taskId]?.stop();
             },
         },
     };

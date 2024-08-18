@@ -38,6 +38,10 @@ export default class Runner {
 
         try {
             for (let i = 0; i < this.actions.length; i++) {
+                if (!this.running.value) {
+                    return;
+                }
+
                 let element
                 let action = this.actions[i]
 
@@ -87,5 +91,9 @@ export default class Runner {
             this.running.value = false
             // await browser.quit()
         }
+    }
+
+    stop() {
+        this.running = false;
     }
 }
