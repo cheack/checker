@@ -6,35 +6,7 @@
 
         <table v-if="tasks.length" class="table table-bordered">
             <tbody>
-            <tr v-for="(task, idx) in tasks" :key="idx">
-                <td>
-                    <p v-if="task.lastLog">
-                        <a @click="showLog(`lastLog${task.id}`)">
-                            <i class="bi bi-camera" title="Show last log"></i>
-                        </a>
-                        <RunnerLog :log="task.lastLog" :ref="`lastLog${task.id}`" />
-                    </p>
-
-                    <button class="btn btn-primary" @click="isRunning(task.id) ? stop(task.id) : run(task.id)">
-                        <span v-if="isRunning(task.id)">
-                            <span class="spinner-border spinner-border-sm"></span>
-                            <span class="bi bi-stop-fill"></span>
-                        </span>
-                        <span v-else class="bi bi-play"></span>
-                    </button>
-
-                    <span class="title">{{ task.title }}</span>
-
-                    <RunnerProgress v-if="runners[task.id]" :runner="runners[task.id]"/>
-                </td>
-                <td style="width: 20%">
-                    <router-link tag="button" class="btn btn-secondary" :to="'/task/' + task.id">
-                        Edit
-                    </router-link>
-                    <button class="btn btn-danger" @click="remove(task.id)">Delete</button>
-                    <button class="btn btn-primary" @click="clone(task.id)">Clone</button>
-                </td>
-            </tr>
+                <ListItem v-for="(task, idx) in tasks" :task="task" :key="idx"></ListItem>
             </tbody>
         </table>
         <p v-else>No tasks</p>
@@ -42,70 +14,18 @@
 </template>
 
 <script>
-import Runner from '../../Runner';
-import RunnerLog from './RunnerLog.vue';
-import RunnerProgress from './RunnerProgress.vue';
-import { watch } from 'vue';
+import ListItem from './ListItem.vue';
 
     export default {
-        components: { RunnerLog, RunnerProgress },
+        components: { ListItem },
         computed: {
             tasks() {
                 return this.$store.getters.tasks
             }
         },
-        data() {
-            return {
-                runners: {}
-            }
-        },
-        methods: {
-            showLog(ref) {
-                this.$refs[ref][0].show()
-            },
-            isRunning(taskId) {
-                return this.runners[taskId]?.running
-            },
-            remove(taskId) {
-                if (confirm('Are you sure?')) {
-                    this.$store.dispatch('deleteTask', taskId)
-                }
-            },
-            clone(taskId) {
-                this.$store.dispatch('cloneTask', taskId)
-            },
-            run(taskId) {
-                const task = this.$store.getters.taskById(taskId)
-                let runner = new Runner()
-                runner.steps = task.steps
-                this.runners[taskId] = runner;
-                runner.run()
-                task.lastLog = runner.log;
-
-                // Наблюдаем за изменениями логов и сохраняем в сторе
-                watch(() => runner.log, (newLogs) => {
-                    this.$store.dispatch('saveTaskLog', { taskId, log: newLogs });
-                }, { deep: true });
-            },
-            stop(taskId) {
-                this.runners[taskId]?.stop();
-            },
-        },
     };
 </script>
 
 <style lang="scss" scoped>
-td {
-    vertical-align: top;
-}
 
-.text {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-.title {
-    padding-left: 5px;
-}
 </style>
