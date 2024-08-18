@@ -8,12 +8,16 @@
                 <RunnerLog :log="task.lastLog" :ref="`lastLog${task.id}`" />
             </p>
 
-            <button class="btn btn-primary" @click="isRunning(task.id) ? stop(task.id) : run(task.id)">
-                <span v-if="isRunning(task.id)">
-                    <span class="spinner-border spinner-border-sm"></span>
-                    <span class="bi bi-stop-fill"></span>
+            <button class="btn btn-primary" @click="isRunning(task.id) ? stop(task.id) : run(task.id)" @mouseenter="this.runButtonHovered = true" @mouseleave="this.runButtonHovered = false">
+                <span v-if="this.runButtonHovered">
+                    <span v-if="isRunning(task.id)" class="bi bi-stop-fill"></span>
                 </span>
-                <span v-else class="bi bi-play"></span>
+                <span v-if="!this.runButtonHovered && isRunning(task.id)">
+                    <span class="spinner-border spinner-border-sm"></span>
+                </span>
+                <span v-if="!isRunning(task.id)">
+                    <span class="bi bi-play"></span>
+                </span>
             </button>
 
             <span class="title">{{ task.title }}</span>
@@ -42,14 +46,10 @@ export default {
         RunnerProgress,
     },
     props: ['key', 'task'],
-    computed: {
-        tasks() {
-            return this.$store.getters.tasks
-        }
-    },
     data() {
         return {
             runner: null,
+            runButtonHovered: false,
         }
     },
     methods: {
